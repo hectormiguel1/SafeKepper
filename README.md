@@ -16,6 +16,6 @@
 # To use:
 	$ git clone https://github.com/hectormiguel1/SafeKepper
 	$ cd SafeKepper/src/
-	$ javac -c  SafeKepper.java ExecuteShellCommand.java
+	$ javac SafeKepper.java ExecuteShellCommand.java
 	$ java SafeKepper 
 	 
