@@ -1,6 +1,6 @@
 # SafeKepper
 
-Usage of SafeKepper --[encrypt/decrypt] filepath 
+          $java SafeKepper --[encrypt/decrypt] filepath 
 
  	 --encrypt: Asks for 3 passwords and encrypts given filepath with said passwords 
 	 
@@ -8,4 +8,11 @@ Usage of SafeKepper --[encrypt/decrypt] filepath
 	 
 	 filepath: is the location of the file which will be encrypted or dercrypted 
 	 
-THIS PROGRAM HEAVILY RELIES ON GPG MV RM SO IT WILL ONLY WORK ON OS WITH THEM INSTALLED!!!!!
+# THIS PROGRAM HEAVILY RELIES ON GPG, MV, RM, SO IT WILL ONLY WORK ON OS WITH THEM INSTALLED!!!!!
+
+	 
+# To use:
+	$ git clone https://github.com/hectormiguel1/SafeKepper
+	$ cd SafeKepper/out/production/SafeKepper/
+	$ java SafeKepper 
+	 
