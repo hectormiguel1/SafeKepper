@@ -4,7 +4,8 @@
 
  	 --encrypt: Asks for 3 passwords and encrypts given filepath with said passwords 
 	 
-	 --decrypt: Asks for 3 passwords and decrypts the given filepath with said passwords 
+	 --decrypt: Asks for 3 passwords and decrypts the given filepath with said passwords add --yes to re-encrypt the file after
+	 use or --no to leave it in plain text.
 	 
 	 filepath: is the location of the file which will be encrypted or dercrypted 
 	 
