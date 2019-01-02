@@ -1,6 +1,7 @@
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class SafeKepper {
@@ -11,7 +12,9 @@ public class SafeKepper {
     private static String password3 = "";
     private static File file;
     private static Console console = System.console();
-    private static ExecuteShellCommand shellCommand = new ExecuteShellCommand();
+    private static boolean reEncrypt = true;
+    private static Process executeShellCommand;
+
 
 
     public static void main(String[] args) {
@@ -22,13 +25,17 @@ public class SafeKepper {
 
           if (whatToDo.equals("--encrypt"))
                encrypt();
-           else if (whatToDo.equals("--decrypt"))
-               decrypt();
+           else if (whatToDo.equals("--decrypt")) {
+               if(args[2].equals("--no"))
+                   reEncrypt = false;
+              decrypt();
+          }
 
        } catch (Exception e) {
            System.out.println("Usage of SafeKepper --[encrypt/decrypt] filepath");
            System.out.println( " \t --encrypt: Asks for 3 passwords and encrypts given filepath with said passwords \n" +
-                   "\t --decrypt: Asks for 3 passwords and decrypts the given filepath with said passwords \n" +
+                   "\t --decrypt: Asks for 3 passwords and decrypts the given filepath with said passwords , enter --yes or --no after file path if you want " +
+                   "the file to be rencrypted after displaying it. \n" +
                    "\t filepath: is the location of the file which will be encrypted or dercrypted \n" +
                    "THIS PROGRAM HEAVILY RELIES ON GPG MV RM SO IT WILL ONLY WORK ON OS WITH THEM INSTALLED!!!!!");
 
@@ -36,8 +43,9 @@ public class SafeKepper {
         }
     }
 
-    private static void decrypt() {
-        shellCommand.executeCommand("clear");
+    private static void decrypt() throws IOException, InterruptedException {
+        executeShellCommand = Runtime.getRuntime().exec("clear");
+        executeShellCommand.waitFor();
         char[] passwordarray = console.readPassword("Enter Level 1 Password: ");
         password1 = new String(passwordarray);
         passwordarray = console.readPassword("Enter Level 2 Password: ");
@@ -45,22 +53,37 @@ public class SafeKepper {
         passwordarray = console.readPassword("Enter Level 3 Password: ");
         password3 = new String(passwordarray);
 
-        shellCommand.executeCommand("mv " + file.getAbsolutePath() + " " + file.getAbsolutePath() + ".gpg");
-        shellCommand.executeCommand("gpg --batch --passphrase " + password3 + " --decrypt-file " + file.getAbsolutePath() + ".gpg");
+        try {
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + " " + file.getAbsolutePath() + ".gpg");
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("gpg --batch --passphrase " + password3 + " --decrypt-file " + file.getAbsolutePath() + ".gpg");
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + " " + file.getAbsolutePath() + ".gpg");
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("gpg --batch --passphrase " + password2 + " --decrypt-file " + file.getAbsolutePath()+ ".gpg");
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + " " + file.getAbsolutePath() + ".gpg");
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("gpg --batch --passphrase " + password1 + " --decrypt-file " + file.getAbsolutePath() + ".gpg");
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("rm " + file.getAbsolutePath() + ".gpg");
+            executeShellCommand.waitFor();
 
-        shellCommand.executeCommand("mv " + file.getAbsolutePath() + " " + file.getAbsolutePath() + ".gpg");
-        shellCommand.executeCommand("gpg --batch --passphrase " + password2 + " --decrypt-file " + file.getAbsolutePath() + ".gpg");
 
-        shellCommand.executeCommand("mv " + file.getAbsolutePath() + " " + file.getAbsolutePath() + ".gpg");
-        shellCommand.executeCommand("gpg --batch --passphrase " + password1 + " --decrypt-file " + file.getAbsolutePath() + ".gpg");
 
-        shellCommand.executeCommand("rm " + file.getAbsolutePath() + ".gpg");
-        shellCommand.executeCommand("cat " + filePath);
+        } catch (IOException e) {
+            System.out.println("Error Moving file, Make sure you have permissions for the file and that MV is installed.");
+        } catch (InterruptedException e) {
+            System.out.println("Error Moving file, Make sure you have permissions for the file and that MV is installed.");
+
+        }
 
         displayFile();
 
-        System.out.println("For security " + file.getAbsolutePath() + " will be encrypted automatically with entered passwords...");
-        encrypt();
+        if(reEncrypt) {
+            System.out.println("For security " + file.getAbsolutePath() + " will be encrypted automatically with entered passwords...");
+            encrypt();
+        }
 
     }
 
@@ -75,7 +98,7 @@ public class SafeKepper {
         }
     }
 
-    private static void encrypt() {
+    private static void encrypt() throws InterruptedException, IOException {
         if(password1.isEmpty() && password2.isEmpty() && password3.isEmpty()) {
             char[] passwordarray = console.readPassword("Enter Level 1 Password: ");
             password1 = new String(passwordarray);
@@ -84,26 +107,37 @@ public class SafeKepper {
             passwordarray = console.readPassword("Enter Level 3 Password: ");
             password3 = new String(passwordarray);
 
-            shellCommand.executeCommand("gpg -c --batch --passphrase " + password1 + " " + file.getAbsolutePath());
-            shellCommand.executeCommand("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand = Runtime.getRuntime().exec("gpg -c --batch --passphrase " + password1 + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("gpg -c --batch --passphrase " + password2 + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
 
-            shellCommand.executeCommand("gpg -c --batch --passphrase " + password2 + " " + file.getAbsolutePath());
-            shellCommand.executeCommand("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
-
-            shellCommand.executeCommand("gpg -c --batch --passphrase " + password3 + " " + file.getAbsolutePath());
-            shellCommand.executeCommand("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand = Runtime.getRuntime().exec("gpg -c --batch --passphrase " + password3 + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
 
             System.out.println("File Successfully Encrypted...");
         }
         else {
-            shellCommand.executeCommand("gpg -c --batch --passphrase " + password1 + " " + file.getAbsolutePath());
-            shellCommand.executeCommand("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
 
-            shellCommand.executeCommand("gpg -c --batch --passphrase " + password2 + " " + file.getAbsolutePath());
-            shellCommand.executeCommand("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand = Runtime.getRuntime().exec("gpg -c --batch --passphrase " + password1 + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("gpg -c --batch --passphrase " + password2 + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
 
-            shellCommand.executeCommand("gpg -c --batch --passphrase " + password3 + " " + file.getAbsolutePath());
-            shellCommand.executeCommand("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand = Runtime.getRuntime().exec("gpg -c --batch --passphrase " + password3 + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
+            executeShellCommand = Runtime.getRuntime().exec("mv " + file.getAbsolutePath() + ".gpg" + " " + file.getAbsolutePath());
+            executeShellCommand.waitFor();
 
             System.out.println("File Successfully Encrypted...");
 
