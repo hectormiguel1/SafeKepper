@@ -11,9 +11,7 @@
 	 
 # THIS PROGRAM HEAVILY RELIES ON GPG, MV, RM, SO IT WILL ONLY WORK ON OS WITH THEM INSTALLED!!!!!
 
-# ExecuteShellCommand is not my code, credit to mickzer on stackoverflow 
 
-	 
 # To use:
 	$ git clone https://github.com/hectormiguel1/SafeKepper
 	$ cd SafeKepper/src/
